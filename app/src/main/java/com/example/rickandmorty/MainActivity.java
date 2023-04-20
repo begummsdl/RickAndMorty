@@ -1,7 +1,5 @@
 package com.example.rickandmorty;
 
-import static androidx.core.content.ContextCompat.startActivity;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
@@ -51,7 +49,7 @@ public class MainActivity extends AppCompatActivity implements LocationListAdapt
 
         initComponents();
         registerEventHandlers();
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR); //ekran yönü için
 
     }
 
