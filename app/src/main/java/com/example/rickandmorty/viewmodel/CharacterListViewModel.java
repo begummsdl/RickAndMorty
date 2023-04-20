@@ -8,7 +8,6 @@ import androidx.lifecycle.ViewModel;
 import com.example.rickandmorty.model.CharacterModel;
 import com.example.rickandmorty.network.APIService;
 import com.example.rickandmorty.network.RetroInstance;
-import com.example.rickandmorty.response.CharacterResponse;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -20,20 +19,66 @@ import retrofit2.Response;
 
 public class CharacterListViewModel extends ViewModel {
 
-    private MutableLiveData<CharacterResponse> charactersList;
+    private MutableLiveData<List<CharacterModel>> charactersList;
 
     public CharacterListViewModel() {
         charactersList = new MutableLiveData<>();
     }
 
-    public MutableLiveData<CharacterResponse> getCharactersListObserver(){
+    public MutableLiveData<List<CharacterModel>> getCharactersListObserver(){
         return charactersList;
     }
 
-    public void makeApiCall(){
+    public void makeApiCall(String ids){
         APIService apiService = RetroInstance.getRetroClient().create(APIService.class);
-        Call<CharacterResponse> call = apiService.getCharacter(2);
-        call.enqueue(new Callback<CharacterResponse>() {
+        String[] splitText = ids.split(",");
+        if (splitText.length > 1){
+            Call<List<CharacterModel>> responseCall = apiService.getCharacterListByIds(ids);
+            responseCall.enqueue(new Callback<List<CharacterModel>>() {
+                @Override
+                public void onResponse(Call<List<CharacterModel>> call, Response<List<CharacterModel>> response) {
+                    if (response.code() == 200){
+                        List<CharacterModel> characters = response.body();
+                        charactersList.postValue(response.body());
+                        for (CharacterModel character:characters){
+                            Log.v("Tag", "Name: "+character.getName());
+                        }
+
+                    }
+                    else {
+                        try {
+                            Log.v("Tag","Error"+response.errorBody().string());
+                        }catch (IOException e){
+                            e.printStackTrace();
+                        }
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<List<CharacterModel>> call, Throwable t) {
+
+                }
+            });
+        }else {
+            Call<CharacterModel> responseCall = apiService.getCharacterById(ids);
+            responseCall.enqueue(new Callback<CharacterModel>() {
+                @Override
+                public void onResponse(Call<CharacterModel> call, Response<CharacterModel> response) {
+                    List<CharacterModel> character = new ArrayList<>();
+                    character.add(response.body());
+                    charactersList.postValue(character);
+                }
+
+                @Override
+                public void onFailure(Call<CharacterModel> call, Throwable t) {
+
+                }
+            });
+        }
+
+
+
+                /*.enqueue(new Callback<CharacterResponse>() {
             @Override
             public void onResponse(Call<CharacterResponse> call, Response<CharacterResponse> response) {
                 if (response.code() == 200){
@@ -57,7 +102,7 @@ public class CharacterListViewModel extends ViewModel {
             public void onFailure(Call<CharacterResponse> call, Throwable t) {
 
             }
-        });
+        });*/
                 /*.enqueue(new Callback<List<CharacterModel>>() {
             @Override
             public void onResponse(Call<List<CharacterModel>> call, Response<List<CharacterModel>> response) {

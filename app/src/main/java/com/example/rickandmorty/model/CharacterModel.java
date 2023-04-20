@@ -7,7 +7,10 @@ import androidx.annotation.NonNull;
 
 import com.example.rickandmorty.model.Location;
 import com.example.rickandmorty.model.Origin;
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
 import java.util.List;
 
 public class CharacterModel implements Parcelable {
@@ -17,7 +20,11 @@ public class CharacterModel implements Parcelable {
     String species;
     String type;
     String gender;
+    @SerializedName("origin")
+    @Expose
     Origin origin;
+    @SerializedName("location")
+    @Expose
     Location location;
     String image;
     List<String> episode;

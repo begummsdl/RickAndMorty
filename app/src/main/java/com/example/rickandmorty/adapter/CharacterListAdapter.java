@@ -1,33 +1,50 @@
 package com.example.rickandmorty.adapter;
 
+import static androidx.core.content.ContextCompat.startActivity;
+
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.example.rickandmorty.DetailsActivity;
 import com.example.rickandmorty.R;
+import com.example.rickandmorty.model.CharacterModel;
+import com.example.rickandmorty.model.LocationModel;
 import com.example.rickandmorty.response.CharacterResponse;
+
+import java.util.List;
 
 
 public class CharacterListAdapter extends RecyclerView.Adapter<CharacterListAdapter.MyViewHolder> {
 
     private Context context;
-    private CharacterResponse characterList;
+    private List<CharacterModel> characterList;
+    private ItemClickListener clickListener;
 
-    public CharacterListAdapter(Context context, CharacterResponse characterList) {
+    public CharacterListAdapter(Context context, List<CharacterModel> characterList, ItemClickListener clickListener) {
         this.context = context;
         this.characterList = characterList;
+        this.clickListener = clickListener;
     }
 
-    public void setCharacterList(CharacterResponse characterList){
+    public void setCharacterList(List<CharacterModel> characterList){
         this.characterList = characterList;
+        notifyDataSetChanged();
+    }
+
+    public void clear() {
+        characterList.clear();
         notifyDataSetChanged();
     }
 
@@ -39,14 +56,15 @@ public class CharacterListAdapter extends RecyclerView.Adapter<CharacterListAdap
     }
 
     @Override
-    public void onBindViewHolder(@NonNull CharacterListAdapter.MyViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull CharacterListAdapter.MyViewHolder holder, @SuppressLint("RecyclerView") int position) {
+
         Glide.with(context)
-                .load(this.characterList.getCharacters().get(position).getImage())
+                .load(this.characterList.get(position).getImage())
                 .apply(RequestOptions.centerCropTransform())
                 .into(holder.imgCharacter);
-        holder.txtCharacterName.setText(this.characterList.getCharacters().get(position).getName().toString());
-        holder.txtCharacterSpecies.setText(this.characterList.getCharacters().get(position).getSpecies().toString());
-        holder.txtCharacterGender.setText(this.characterList.getCharacters().get(position).getGender().toString());
+        holder.txtCharacterName.setText(this.characterList.get(position).getName().toString());
+        holder.txtCharacterSpecies.setText(this.characterList.get(position).getSpecies().toString());
+        holder.txtCharacterGender.setText(this.characterList.get(position).getGender().toString());
         if ("male".equals(holder.txtCharacterGender.getText().toString().toLowerCase())){
             holder.imgGender.setImageResource(R.drawable.gender_male);
         }else if ("female".equals(holder.txtCharacterGender.getText().toString().toLowerCase())){
@@ -54,7 +72,7 @@ public class CharacterListAdapter extends RecyclerView.Adapter<CharacterListAdap
         }else {
             holder.imgGender.setImageResource(R.drawable.gender_unknown);
         }
-        holder.txtCharacterStatus.setText(this.characterList.getCharacters().get(position).getStatus().toString());
+        holder.txtCharacterStatus.setText(this.characterList.get(position).getStatus().toString());
         if ("dead".equals(holder.txtCharacterStatus.getText().toString().toLowerCase())){
             holder.imgStatus.setImageResource(R.drawable.status_dead);
         } else if ("alive".equals(holder.txtCharacterStatus.getText().toString().toLowerCase())) {
@@ -62,14 +80,18 @@ public class CharacterListAdapter extends RecyclerView.Adapter<CharacterListAdap
         }else {
             holder.imgStatus.setImageResource(R.drawable.status_unknown);
         }
+
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                clickListener.onCharacterClick(characterList.get(position));
+            }
+        });
     }
 
     @Override
     public int getItemCount() {
-        if (this.characterList != null){
-            return this.characterList.getCharacters().size();
-        }
-        return 0;
+        return this.characterList == null ? 0 : this.characterList.size();
     }
 
     public class MyViewHolder extends RecyclerView.ViewHolder{
@@ -86,5 +108,9 @@ public class CharacterListAdapter extends RecyclerView.Adapter<CharacterListAdap
             imgGender = itemView.findViewById(R.id.imgGender);
             imgStatus = itemView.findViewById(R.id.imgStatus);
         }
+    }
+
+    public interface ItemClickListener{
+        public void onCharacterClick(CharacterModel character);
     }
 }

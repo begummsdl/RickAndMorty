@@ -16,8 +16,8 @@
             <ImageView
                 android:id="@+id/imgCharacter"
                 android:tag="image_tag"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
+                android:layout_width="125dp"
+                android:layout_height="125dp"
                 android:layout_margin="5dp"
                 android:src="@drawable/ic_launcher_background"/>
 
@@ -27,12 +27,15 @@
                 android:layout_weight="1"
                 android:layout_margin="5dp"
                 android:orientation="vertical"
+                android:layout_gravity="center"
                 >
 
                 <TextView
                     android:id="@+id/txtCharacterName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:textStyle="bold"
+                    android:textSize="18sp"
                     android:layout_marginTop="10dp"
                     android:text="Character Name"/>
 
@@ -40,6 +43,7 @@
                     android:id="@+id/txtCharacterSpecies"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:textAllCaps="true"
                     android:layout_marginTop="10dp"
                     android:text="Species"/>
 
