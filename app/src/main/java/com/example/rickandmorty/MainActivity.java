@@ -4,10 +4,8 @@ import static androidx.core.content.ContextCompat.startActivity;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.widget.NestedScrollView;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
-import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -16,23 +14,17 @@ import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
-import android.widget.ProgressBar;
-import android.widget.ScrollView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.rickandmorty.adapter.CharacterListAdapter;
 import com.example.rickandmorty.adapter.LocationListAdapter;
 import com.example.rickandmorty.model.CharacterModel;
 import com.example.rickandmorty.model.LocationModel;
-import com.example.rickandmorty.response.CharacterResponse;
 import com.example.rickandmorty.response.LocationResponse;
 import com.example.rickandmorty.viewmodel.CharacterListViewModel;
 import com.example.rickandmorty.viewmodel.LocationListViewModel;
 
 import java.util.List;
-
-import retrofit2.Call;
 
 public class MainActivity extends AppCompatActivity implements LocationListAdapter.ItemClickListener,CharacterListAdapter.ItemClickListener {
 
@@ -49,9 +41,7 @@ public class MainActivity extends AppCompatActivity implements LocationListAdapt
     private LocationResponse locationModelList;
     private LocationListAdapter locationListAdapter;
     private LocationListViewModel locationViewModel;
-    private ProgressBar loadingPB;
     int currentPage = 1;
-    private static final int VISIBLE_THRESHOLD = 5;
     boolean isLoading = false;
 
     @Override
@@ -69,7 +59,6 @@ public class MainActivity extends AppCompatActivity implements LocationListAdapt
         characterRecyclerView = findViewById(R.id.characterRecyclerView);
         locationRecyclerView = findViewById(R.id.locationRecyclerView);
         noResult = findViewById(R.id.characterNotFound);
-        loadingPB = findViewById(R.id.itemLoading);
     }
 
     private void registerEventHandlers() {
@@ -118,16 +107,11 @@ public class MainActivity extends AppCompatActivity implements LocationListAdapt
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
                 LinearLayoutManager linearLayoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
-                int totalItemCount = linearLayoutManager.getItemCount();
-                int lastVisibleItemPosition = linearLayoutManager.findLastVisibleItemPosition();
-
-                boolean isEndReached = !recyclerView.canScrollHorizontally(1);
 
                 if (!isLoading){
                     if (linearLayoutManager != null && linearLayoutManager.findLastCompletelyVisibleItemPosition() == locationModelList.getLocations().size() - 1) {
                         currentPage += 1;
                         if (currentPage<8){
-                            loadingPB.setVisibility(View.VISIBLE);
                             loadMore(currentPage);
                         }
                         else{
@@ -142,18 +126,26 @@ public class MainActivity extends AppCompatActivity implements LocationListAdapt
 
     private void loadMore(int page) {
 
+        locationModelList.getLocations().add(null);
+        locationListAdapter.notifyItemInserted(locationModelList.getLocations().size() - 1);
+
+
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
+                locationModelList.getLocations().remove(locationModelList.getLocations().size() - 1);
+                int scrollPosition = locationModelList.getLocations().size();
+                locationListAdapter.notifyItemRemoved(scrollPosition);
 
                 locationViewModel.makeApiCall(page);
-                loadingPB.setVisibility(View.GONE);
+                locationListAdapter.setRowIndex(0);
                 locationRecyclerView.scrollToPosition(0);
 
+                locationListAdapter.notifyDataSetChanged();
+                isLoading = false;
             }
         }, 2000);
-
 
     }
 

@@ -58,16 +58,5 @@ public class LocationListViewModel extends ViewModel {
 
             }
         });
-                /*.enqueue(new Callback<List<CharacterModel>>() {
-            @Override
-            public void onResponse(Call<List<CharacterModel>> call, Response<List<CharacterModel>> response) {
-                charactersList.postValue(response.body());
-            }
-
-            @Override
-            public void onFailure(Call<List<CharacterModel>> call, Throwable t) {
-                charactersList.postValue(null);
-            }
-        });*/
     }
 }
