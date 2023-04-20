@@ -110,6 +110,7 @@ public class MainActivity extends AppCompatActivity implements LocationListAdapt
                     if (linearLayoutManager != null && linearLayoutManager.findLastCompletelyVisibleItemPosition() == locationModelList.getLocations().size() - 1) {
                         currentPage += 1;
                         if (currentPage<8){
+                            isLoading=true;
                             loadMore(currentPage);
                         }
                         else{
